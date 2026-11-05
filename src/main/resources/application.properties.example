@@ -1,0 +1,17 @@
+server.port=8082
+spring.application.name=product-catalogue
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/product_catalogue
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD_HERE
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+spring.jackson.serialization.indent_output=true
+
+app.seed.enabled=false
+app.ussd.session-ttl-seconds=180
