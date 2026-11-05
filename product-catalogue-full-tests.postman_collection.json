@@ -1,0 +1,1137 @@
+{
+  "info": {
+    "name": "Product Catalogue - full tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - Categories",
+      "item": [
+        {
+          "name": "Create category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 201\", function(){ pm.response.to.have.status(201); });",
+                  "pm.test(\"json.name equal Thunder Test Cat\", function(){ var json = pm.response.json(); var actual = String(json.name); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Thunder Test Cat\")); });",
+                  "try { pm.collectionVariables.set(\"catId\", pm.response.json().id); } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Test Cat\",\n  \"description\": \"created by Thunder\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create duplicate category -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"body contains already exists\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"already exists\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"thunder test cat\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create category without name -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"json.error equal Validation Failed\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Validation Failed\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/categories",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "List categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories"
+          }
+        },
+        {
+          "name": "Get category by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.name equal Thunder Test Cat\", function(){ var json = pm.response.json(); var actual = String(json.name); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Thunder Test Cat\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories/{{catId}}"
+          }
+        },
+        {
+          "name": "Get missing category -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 404\", function(){ pm.response.to.have.status(404); });",
+                  "pm.test(\"json.error equal Not Found\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Not Found\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories/99999999"
+          }
+        },
+        {
+          "name": "Categories as plain text",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"body contains Thunder Test Cat\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Thunder Test Cat\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "text/plain" }],
+            "url": "{{baseUrl}}/api/categories/list"
+          }
+        },
+        {
+          "name": "Update category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.description equal updated\", function(){ var json = pm.response.json(); var actual = String(json.description); pm.expect(actual).to.eql(pm.variables.replaceIn(\"updated\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/categories/{{catId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Test Cat\",\n  \"description\": \"updated\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Products",
+      "item": [
+        {
+          "name": "Create product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 201\", function(){ pm.response.to.have.status(201); });",
+                  "pm.test(\"json.name equal Thunder Bundle\", function(){ var json = pm.response.json(); var actual = String(json.name); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Thunder Bundle\")); });",
+                  "pm.test(\"json.category.name equal Thunder Test Cat\", function(){ var json = pm.response.json(); var actual = String(json.category.name); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Thunder Test Cat\")); });",
+                  "try { pm.collectionVariables.set(\"prodId\", pm.response.json().id); } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 500.0,\n  \"categoryId\": \"{{catId}}\",\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create product price 0 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"json.error equal Validation Failed\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Validation Failed\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 0,\n  \"categoryId\": \"{{catId}}\",\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create product validity -1 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": -1,\n  \"price\": 500.0,\n  \"categoryId\": \"{{catId}}\",\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create product blank name -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 500.0,\n  \"categoryId\": \"{{catId}}\",\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create product without categoryId -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"body contains categoryId is required\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"categoryId is required\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 500.0,\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Create product unknown category -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 404\", function(){ pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 500.0,\n  \"categoryId\": 99999999,\n  \"active\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "List products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products"
+          }
+        },
+        {
+          "name": "Filter by categoryId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.length equal 1\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"1\")); });",
+                  "pm.test(\"json[0].name equal Thunder Bundle\", function(){ var json = pm.response.json(); var actual = String(json[0].name); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Thunder Bundle\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products?categoryId={{catId}}"
+          }
+        },
+        {
+          "name": "Search by name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"body contains Thunder Bundle\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Thunder Bundle\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products?name=thunder"
+          }
+        },
+        {
+          "name": "Active only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products?activeOnly=true"
+          }
+        },
+        {
+          "name": "Get product by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.price equal 500\", function(){ var json = pm.response.json(); var actual = String(json.price); pm.expect(actual).to.eql(pm.variables.replaceIn(\"500\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/{{prodId}}"
+          }
+        },
+        {
+          "name": "Get missing product -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 404\", function(){ pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/99999999"
+          }
+        },
+        {
+          "name": "Products as plain text",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"body contains Thunder Bundle\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Thunder Bundle\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "text/plain" }],
+            "url": "{{baseUrl}}/api/products/list?categoryId={{catId}}"
+          }
+        },
+        {
+          "name": "Update product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.price equal 750\", function(){ var json = pm.response.json(); var actual = String(json.price); pm.expect(actual).to.eql(pm.variables.replaceIn(\"750\")); });",
+                  "pm.test(\"json.active equal false\", function(){ var json = pm.response.json(); var actual = String(json.active); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/products/{{prodId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Thunder Bundle\",\n  \"description\": \"test bundle\",\n  \"validityDays\": 7,\n  \"price\": 750.0,\n  \"categoryId\": \"{{catId}}\",\n  \"active\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Deactivated product not in activeOnly",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"body notcontains Thunder Bundle\", function(){ var actual = pm.response.text(); pm.expect(actual).to.not.include(pm.variables.replaceIn(\"Thunder Bundle\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products?activeOnly=true"
+          }
+        },
+        {
+          "name": "Delete product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 204\", function(){ pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/{{prodId}}"
+          }
+        },
+        {
+          "name": "Delete product again -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 404\", function(){ pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/products/{{prodId}}"
+          }
+        },
+        {
+          "name": "Delete test category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 204\", function(){ pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories/{{catId}}"
+          }
+        },
+        {
+          "name": "Delete category again -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 404\", function(){ pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories/{{catId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Customers",
+      "item": [
+        {
+          "name": "Get (auto-creates) account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.phoneNumber equal {{custPhone}}\", function(){ var json = pm.response.json(); var actual = String(json.phoneNumber); pm.expect(actual).to.eql(pm.variables.replaceIn(\"{{custPhone}}\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/customers/{{custPhone}}"
+          }
+        },
+        {
+          "name": "Top up 500",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.phoneNumber equal {{custPhone}}\", function(){ var json = pm.response.json(); var actual = String(json.phoneNumber); pm.expect(actual).to.eql(pm.variables.replaceIn(\"{{custPhone}}\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/customers/{{custPhone}}/topup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Top up 0 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });",
+                  "pm.test(\"json.error equal Validation Failed\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Validation Failed\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/customers/{{custPhone}}/topup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Top up negative -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/customers/{{custPhone}}/topup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -10\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Top up without amount -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/customers/{{custPhone}}/topup",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Web chat",
+      "item": [
+        {
+          "name": "Chat: start",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.ended equal false\", function(){ var json = pm.response.json(); var actual = String(json.ended); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });",
+                  "pm.test(\"body contains browse\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"browse\")); });",
+                  "try { pm.collectionVariables.set(\"chatSid\", pm.response.json().sessionId); } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Chat: pick category 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.ended equal false\", function(){ var json = pm.response.json(); var actual = String(json.ended); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{chatSid}}\",\n  \"message\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Chat: exit 00",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.ended equal true\", function(){ var json = pm.response.json(); var actual = String(json.ended); pm.expect(actual).to.eql(pm.variables.replaceIn(\"true\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{chatSid}}\",\n  \"message\": \"00\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Chat: ended session id starts a NEW chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.ended equal false\", function(){ var json = pm.response.json(); var actual = String(json.ended); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });",
+                  "pm.test(\"body contains browse\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"browse\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{chatSid}}\",\n  \"message\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Chat: invalid choice ends chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "try { pm.collectionVariables.set(\"chatSid2\", pm.response.json().sessionId); } catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Chat: invalid choice 999",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });",
+                  "pm.test(\"json.ended equal true\", function(){ var json = pm.response.json(); var actual = String(json.ended); pm.expect(actual).to.eql(pm.variables.replaceIn(\"true\")); });",
+                  "pm.test(\"body contains not a valid selection\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not a valid selection\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/chat",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{chatSid2}}\",\n  \"message\": \"999\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5A - USSD path 1*2*1 then 00, every step recorded",
+      "item": [
+        {
+          "name": "1. Dial *140#",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidA\", pm.response.json().sessionId); } catch (e) {}"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "2. Input 1 (English) -> category list",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Dial *100#\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Dial* 100#\")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "3. Input 2 (category #2) -> product list",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body notcontains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.not.include(pm.variables.replaceIn(\"END \")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"2\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "4. Input 1 (product #1) -> detail, session stays OPEN",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body notcontains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.not.include(pm.variables.replaceIn(\"END \")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "5. Session still ACTIVE after step 4",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ACTIVE\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ACTIVE\")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneA}}" }
+        },
+        {
+          "name": "6. Input 00 -> session ENDS",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "7. All 5 steps recorded in order",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 5\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"5\")); });","pm.test(\"json[0].level equal LANGUAGE_SELECTION\", function(){ var json = pm.response.json(); var actual = String(json[0].level); pm.expect(actual).to.eql(pm.variables.replaceIn(\"LANGUAGE_SELECTION\")); });","pm.test(\"json[1].inputText equal 1\", function(){ var json = pm.response.json(); var actual = String(json[1].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"1\")); });","pm.test(\"json[1].level equal CATEGORY_LIST\", function(){ var json = pm.response.json(); var actual = String(json[1].level); pm.expect(actual).to.eql(pm.variables.replaceIn(\"CATEGORY_LIST\")); });","pm.test(\"json[2].inputText equal 2\", function(){ var json = pm.response.json(); var actual = String(json[2].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"2\")); });","pm.test(\"json[2].level equal PRODUCT_LIST\", function(){ var json = pm.response.json(); var actual = String(json[2].level); pm.expect(actual).to.eql(pm.variables.replaceIn(\"PRODUCT_LIST\")); });","pm.test(\"json[3].inputText equal 1\", function(){ var json = pm.response.json(); var actual = String(json[3].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"1\")); });","pm.test(\"json[4].inputText equal 00\", function(){ var json = pm.response.json(); var actual = String(json[4].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"00\")); });","pm.test(\"json[4].responseMessage contains END \", function(){ var json = pm.response.json(); var actual = String(json[4].responseMessage); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions/{{sidA}}/steps" }
+        },
+        {
+          "name": "8. Session record is ENDED / USER_EXIT",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[0].endReason equal USER_EXIT\", function(){ var json = pm.response.json(); var actual = String(json[0].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"USER_EXIT\")); });","pm.test(\"json[0].language equal EN\", function(){ var json = pm.response.json(); var actual = String(json[0].language); pm.expect(actual).to.eql(pm.variables.replaceIn(\"EN\")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneA}}" }
+        },
+        {
+          "name": "9. No ACTIVE session left for this phone",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 0\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"0\")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneA}}&status=ACTIVE" }
+        },
+        {
+          "name": "10. Re-using the ended sessionId is rejected",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "11. NEXT dial gets a brand-new session",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidA2\", pm.response.json().sessionId); } catch (e) {}"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "12. New session is ACTIVE and recorded",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ACTIVE\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ACTIVE\")); });","pm.test(\"json[0].currentLevel equal LANGUAGE_SELECTION\", function(){ var json = pm.response.json(); var actual = String(json[0].currentLevel); pm.expect(actual).to.eql(pm.variables.replaceIn(\"LANGUAGE_SELECTION\")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneA}}" }
+        },
+        {
+          "name": "13. Finish it with 00 (cleanup)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }],
+          "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidA2}}\",\n  \"phoneNumber\": \"{{phoneA}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } }
+        },
+        {
+          "name": "14. Cleaned: no ACTIVE left",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 0\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"0\")); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneA}}&status=ACTIVE" }
+        }
+      ]
+    },
+    {
+      "name": "5A2 - USSD product detail: 0 = back, then 00",
+      "item": [
+        { "name": "1. Dial", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidH\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. English", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidH}}\",\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. Category #1", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidH}}\",\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "4. Product #1 (detail or group list)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body notcontains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.not.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidH}}\",\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "5. 0 = back, session continues", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body notcontains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.not.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidH}}\",\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"0\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "6. 00 = exit", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidH}}\",\n  \"phoneNumber\": \"{{phoneH}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "7. 6 steps recorded", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 6\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"6\")); });","pm.test(\"json[4].inputText equal 0\", function(){ var json = pm.response.json(); var actual = String(json[4].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"0\")); });","pm.test(\"json[5].inputText equal 00\", function(){ var json = pm.response.json(); var actual = String(json[5].inputText); pm.expect(actual).to.eql(pm.variables.replaceIn(\"00\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions/{{sidH}}/steps" } },
+        { "name": "8. ENDED / USER_EXIT", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[0].endReason equal USER_EXIT\", function(){ var json = pm.response.json(); var actual = String(json[0].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"USER_EXIT\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneH}}" } }
+      ]
+    },
+    {
+      "name": "5B - USSD exit with 00, then next session",
+      "item": [
+        { "name": "1. Dial", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidB\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. Choose Kinyarwanda (2)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidB}}\",\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"2\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. Exit 00", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidB}}\",\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "4. ENDED / USER_EXIT / RW", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[0].endReason equal USER_EXIT\", function(){ var json = pm.response.json(); var actual = String(json[0].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"USER_EXIT\")); });","pm.test(\"json[0].language equal RW\", function(){ var json = pm.response.json(); var actual = String(json[0].language); pm.expect(actual).to.eql(pm.variables.replaceIn(\"RW\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneB}}" } },
+        { "name": "5. 3 steps recorded", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 3\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"3\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions/{{sidB}}/steps" } },
+        { "name": "6. Ended session rejected", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidB}}\",\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "7. Next dial = new session", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidB2\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "8. Cleanup with 00", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidB2}}\",\n  \"phoneNumber\": \"{{phoneB}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "5C - USSD invalid selection",
+      "item": [
+        { "name": "1. Dial", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidC\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneC}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. English", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidC}}\",\n  \"phoneNumber\": \"{{phoneC}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. Category 99 -> END", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });","pm.test(\"body contains Invalid selection\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Invalid selection\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidC}}\",\n  \"phoneNumber\": \"{{phoneC}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"99\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "4. ENDED / INVALID_SELECTION", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[0].endReason equal INVALID_SELECTION\", function(){ var json = pm.response.json(); var actual = String(json[0].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"INVALID_SELECTION\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneC}}" } },
+        { "name": "5. Ended session rejected", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidC}}\",\n  \"phoneNumber\": \"{{phoneC}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "5D - USSD expiry (needs session-ttl-seconds=20)",
+      "item": [
+        { "name": "1. Dial  >>> now WAIT 25 seconds <<<", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidD\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneD}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. Continue after expiry -> 400 expired", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidD}}\",\n  \"phoneNumber\": \"{{phoneD}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. Expired session already closed: ENDED / TIMEOUT", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[0].endReason equal TIMEOUT\", function(){ var json = pm.response.json(); var actual = String(json[0].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"TIMEOUT\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneD}}" } },
+        { "name": "4. Timeout step recorded", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 2\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"2\")); });","pm.test(\"json[1].responseMessage contains timed out\", function(){ var json = pm.response.json(); var actual = String(json[1].responseMessage); pm.expect(actual).to.include(pm.variables.replaceIn(\"timed out\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions/{{sidD}}/steps" } },
+        { "name": "5. No ACTIVE session", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 0\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"0\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneD}}&status=ACTIVE" } },
+        { "name": "6. Next dial = new session", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidD2\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneD}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "7. New session ACTIVE, expired one stays ENDED", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ACTIVE\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ACTIVE\")); });","pm.test(\"json[1].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[1].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[1].endReason equal TIMEOUT\", function(){ var json = pm.response.json(); var actual = String(json[1].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"TIMEOUT\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneD}}" } },
+        { "name": "8. Cleanup with 00", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidD2}}\",\n  \"phoneNumber\": \"{{phoneD}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "5E - USSD re-dial supersedes the open session",
+      "item": [
+        { "name": "1. Dial (session 1)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidE1\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneE}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. Dial again (session 2)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidE2\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneE}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. Newest ACTIVE, older ENDED / SUPERSEDED", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].status equal ACTIVE\", function(){ var json = pm.response.json(); var actual = String(json[0].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ACTIVE\")); });","pm.test(\"json[1].status equal ENDED\", function(){ var json = pm.response.json(); var actual = String(json[1].status); pm.expect(actual).to.eql(pm.variables.replaceIn(\"ENDED\")); });","pm.test(\"json[1].endReason equal SUPERSEDED\", function(){ var json = pm.response.json(); var actual = String(json[1].endReason); pm.expect(actual).to.eql(pm.variables.replaceIn(\"SUPERSEDED\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneE}}" } },
+        { "name": "4. Exactly one ACTIVE", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 1\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"1\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneE}}&status=ACTIVE" } },
+        { "name": "5. Old session id is dead", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidE1}}\",\n  \"phoneNumber\": \"{{phoneE}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "6. Cleanup with 00", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidE2}}\",\n  \"phoneNumber\": \"{{phoneE}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "5F - USSD request validation",
+      "item": [
+        { "name": "1. Dial from phone F", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.error equal false\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"false\")); });","pm.test(\"body contains Select language:\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"Select language:\")); });","try { pm.collectionVariables.set(\"sidF\", pm.response.json().sessionId); } catch (e) {}"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"{{phoneF}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "2. Another phone cannot use this session", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"body contains does not belong\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"does not belong\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidF}}\",\n  \"phoneNumber\": \"{{phoneG}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "3. requestId 5 -> 400", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 5,\n  \"phoneNumber\": \"{{phoneF}}\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "4. Missing phoneNumber -> 400", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 1,\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "5. Missing requestId -> 400", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"phoneNumber\": \"{{phoneF}}\",\n  \"text\": \"\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "6. Unknown sessionId -> 400", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 400\", function(){ pm.response.to.have.status(400); });","pm.test(\"json.error equal Invalid Session\", function(){ var json = pm.response.json(); var actual = String(json.error); pm.expect(actual).to.eql(pm.variables.replaceIn(\"Invalid Session\")); });","pm.test(\"body contains not found or has expired\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"not found or has expired\")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{unknownSid}}\",\n  \"phoneNumber\": \"{{phoneF}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"1\"\n}", "options": { "raw": { "language": "json" } } } } },
+        { "name": "7. Cleanup with 00", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains END \", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"END \")); });"] } }], "request": { "method": "POST", "header": [{ "key": "Accept", "value": "application/json" },{ "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/ussd", "body": { "mode": "raw", "raw": "{\n  \"requestId\": 0,\n  \"sessionId\": \"{{sidF}}\",\n  \"phoneNumber\": \"{{phoneF}}\",\n  \"serviceCode\": \"*140#\",\n  \"text\": \"00\"\n}", "options": { "raw": { "language": "json" } } } } }
+      ]
+    },
+    {
+      "name": "5G - USSD audit endpoints",
+      "item": [
+        { "name": "Callers (every number that dialled)", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains {{phoneA}}\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"{{phoneA}}\")); });","pm.test(\"body contains {{phoneB}}\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"{{phoneB}}\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/callers" } },
+        { "name": "Dial logs for phone A", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json[0].phoneNumber equal {{phoneA}}\", function(){ var json = pm.response.json(); var actual = String(json[0].phoneNumber); pm.expect(actual).to.eql(pm.variables.replaceIn(\"{{phoneA}}\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/dial-logs?phoneNumber={{phoneA}}" } },
+        { "name": "Failed dials are logged too", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"body contains FAILED\", function(){ var actual = pm.response.text(); pm.expect(actual).to.include(pm.variables.replaceIn(\"FAILED\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/dial-logs?phoneNumber={{phoneC}}" } },
+        { "name": "All sessions", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions" } },
+        { "name": "No ACTIVE sessions anywhere for test phones", "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test(\"status is 200\", function(){ pm.response.to.have.status(200); });","pm.test(\"json.length equal 0\", function(){ var json = pm.response.json(); var actual = String(json.length); pm.expect(actual).to.eql(pm.variables.replaceIn(\"0\")); });"] } }], "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/ussd/sessions?phoneNumber={{phoneF}}&status=ACTIVE" } }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8082" },
+    { "key": "phoneA", "value": "+250780000001" },
+    { "key": "phoneB", "value": "+250780000002" },
+    { "key": "phoneC", "value": "+250780000003" },
+    { "key": "phoneD", "value": "+250780000004" },
+    { "key": "phoneE", "value": "+250780000005" },
+    { "key": "phoneF", "value": "+250780000006" },
+    { "key": "phoneG", "value": "+250780000007" },
+    { "key": "phoneH", "value": "+250780000008" },
+    { "key": "custPhone", "value": "+250788000001" },
+    { "key": "catId", "value": "" },
+    { "key": "prodId", "value": "" },
+    { "key": "chatSid", "value": "" },
+    { "key": "chatSid2", "value": "" },
+    { "key": "sidA", "value": "" },
+    { "key": "sidA2", "value": "" },
+    { "key": "sidB", "value": "" },
+    { "key": "sidB2", "value": "" },
+    { "key": "sidC", "value": "" },
+    { "key": "sidD", "value": "" },
+    { "key": "sidD2", "value": "" },
+    { "key": "sidE1", "value": "" },
+    { "key": "sidE2", "value": "" },
+    { "key": "sidF", "value": "" },
+    { "key": "sidH", "value": "" },
+    { "key": "unknownSid", "value": "00000000-0000-0000-0000-000000000000" }
+  ]
+}

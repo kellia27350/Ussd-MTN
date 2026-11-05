@@ -1,0 +1,304 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Product Catalogue API",
+  "dateExported": "2026-07-22T00:00:00.000Z",
+  "version": "1.2",
+  "folders": [
+    {
+      "_id": "f1",
+      "name": "Categories"
+    },
+    {
+      "_id": "f2",
+      "name": "Products"
+    },
+    {
+      "_id": "f3",
+      "name": "USSD *140#"
+    }
+  ],
+  "requests": [
+    {
+      "_id": "r1",
+      "colId": "c1",
+      "containerId": "f1",
+      "name": "Get All Categories",
+      "url": "http://localhost:8081/api/categories",
+      "method": "GET"
+    },
+    {
+      "_id": "r2",
+      "colId": "c1",
+      "containerId": "f1",
+      "name": "Create Category",
+      "url": "http://localhost:8081/api/categories",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Roaming Bundles\",\n  \"description\": \"International roaming data/voice bundles\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r3",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Get All Products",
+      "url": "http://localhost:8081/api/products",
+      "method": "GET"
+    },
+    {
+      "_id": "r4",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Get Product By Id",
+      "url": "http://localhost:8081/api/products/1",
+      "method": "GET"
+    },
+    {
+      "_id": "r5",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Create Product",
+      "url": "http://localhost:8081/api/products",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Weekend 2GB\",\n  \"description\": \"2GB valid Saturday-Sunday\",\n  \"validityDays\": 2,\n  \"price\": 800.00,\n  \"categoryId\": 1,\n  \"active\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r6",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Update Product",
+      "url": "http://localhost:8081/api/products/1",
+      "method": "PUT",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Daily 150MB\",\n  \"description\": \"Updated: 150MB data valid for 1 day\",\n  \"validityDays\": 1,\n  \"price\": 120.00,\n  \"categoryId\": 1,\n  \"active\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r7",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Delete Product",
+      "url": "http://localhost:8081/api/products/1",
+      "method": "DELETE"
+    },
+    {
+      "_id": "r8",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Search Products by Name",
+      "url": "http://localhost:8081/api/products?name=data",
+      "method": "GET"
+    },
+    {
+      "_id": "r9",
+      "colId": "c1",
+      "containerId": "f2",
+      "name": "Get Products by Category",
+      "url": "http://localhost:8081/api/products?categoryId=1",
+      "method": "GET"
+    },
+    {
+      "_id": "r10",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD - 1. Start new session and get server sessionId",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"\",\n  \"serviceCode\": \"*140#\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r11",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD - 2. Continue: choose English (requestId=0, paste returned sessionId)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\",\n  \"serviceCode\": \"*140#\",\n  \"sessionId\": \"PASTE_SESSION_ID_FROM_STEP_1\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r12",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD - 3. Continue: choose category 1 (requestId=0, same sessionId)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\",\n  \"serviceCode\": \"*140#\",\n  \"sessionId\": \"PASTE_SESSION_ID_FROM_STEP_1\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r13",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD error - requestId=0 with no sessionId (400 expected)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r14",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD error - requestId=0 with unknown sessionId (400 expected)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\",\n  \"sessionId\": \"00000000-0000-0000-0000-000000000000\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r15",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "USSD error - requestId=2 (invalid, 400 expected)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 2,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r16",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "Resume test - 1. Start session, pick category 1, then abandon",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r17",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "Resume test - 2. requestId=0 pick category 1 (paste sessionId, then STOP here)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\",\n  \"sessionId\": \"PASTE_SESSION_ID_FROM_R16\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r18",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "Resume test - 3. Start a brand-new session (requestId=1, offers Continue/Start new)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 1,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "r19",
+      "colId": "c1",
+      "containerId": "f3",
+      "name": "Resume test - 4. Continue where left off (paste NEW sessionId, text=1)",
+      "url": "http://localhost:8081/ussd",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"requestId\": 0,\n  \"phoneNumber\": \"+250780000000\",\n  \"text\": \"1\",\n  \"sessionId\": \"PASTE_SESSION_ID_FROM_R18\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    }
+  ]
+}

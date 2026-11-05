@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run ProductCatalogueApplication",
+      "request": "launch",
+      "mainClass": "com.example.productcatalogue.ProductCatalogueApplication",
+      "projectName": "product-catalogue",
+      "env": {
+        "JAVA_HOME": "C:\\Program Files\\Java\\jdk-27"
+      }
+    },
+    {
+      "type": "java",
+      "name": "Debug ProductCatalogueApplication",
+      "request": "launch",
+      "mainClass": "com.example.productcatalogue.ProductCatalogueApplication",
+      "projectName": "product-catalogue",
+      "env": {
+        "JAVA_HOME": "C:\\Program Files\\Java\\jdk-27"
+      },
+      "vmArgs": "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot Run (Maven task)",
+      "request": "launch",
+      "preLaunchTask": "Maven: Spring Boot Run",
+      "mainClass": "com.example.productcatalogue.ProductCatalogueApplication",
+      "projectName": "product-catalogue"
+    }
+  ]
+}

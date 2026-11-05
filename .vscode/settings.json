@@ -1,0 +1,13 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.home": "C:\\Program Files\\Java\\jdk-27",
+  "maven.executable.path": "C:\\Program Files\\apache-maven-3.9.16\\bin\\mvn.cmd",
+  "maven.terminal.useJavaHome": true,
+  "java.compile.nullAnalysis.mode": "automatic",
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/target": true,
+    "**/.idea": true
+  },
+  "spring-boot.ls.java.home": "C:\\Program Files\\Java\\jdk-27"
+}

@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Maven: Build (skip tests)",
+      "type": "shell",
+      "command": "mvn",
+      "args": ["-f", "${workspaceFolder}/pom.xml", "clean", "package", "-DskipTests"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Maven: Spring Boot Run",
+      "type": "shell",
+      "command": "mvn",
+      "args": ["-f", "${workspaceFolder}/pom.xml", "spring-boot:run"],
+      "group": "none",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "spring-boot",
+        "pattern": {
+          "regexp": "^$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting ProductCatalogueApplication.*$",
+          "endsPattern": "^.*Started ProductCatalogueApplication.*$"
+        }
+      }
+    },
+    {
+      "label": "Maven: Test",
+      "type": "shell",
+      "command": "mvn",
+      "args": ["-f", "${workspaceFolder}/pom.xml", "test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}
