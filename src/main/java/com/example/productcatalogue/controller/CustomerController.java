@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/customers/{phoneNumber}")
 class CustomerController {
 
     private final CustomerAccountRepository repo;
@@ -19,12 +19,12 @@ class CustomerController {
         this.repo = repo;
     }
 
-    @GetMapping("/{phoneNumber}")
+    @GetMapping
     public ResponseEntity<CustomerAccount> getAccount(@PathVariable String phoneNumber) {
         return ResponseEntity.ok(getOrCreate(phoneNumber));
     }
 
-    @PostMapping("/{phoneNumber}/topup")
+    @PostMapping("/topup")
     public ResponseEntity<CustomerAccount> topUp(@PathVariable String phoneNumber,
                                                  @Valid @RequestBody TopUpRequest request) {
         CustomerAccount account = getOrCreate(phoneNumber);

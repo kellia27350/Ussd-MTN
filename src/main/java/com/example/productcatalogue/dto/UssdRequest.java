@@ -1,12 +1,13 @@
 package com.example.productcatalogue.dto;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@JacksonXmlRootElement(localName = "ussdRequest")
+@JsonRootName("ussdRequest")
 public class UssdRequest {
 
     @NotNull(message = "requestId is required")
@@ -22,6 +23,11 @@ public class UssdRequest {
 
     private String text;
 
+    // Set by the server only (never read from the client payload).
+    @JsonIgnore private String channel = "API";
+    @JsonIgnore private String cellId;
+    @JsonIgnore private String imsi;
+
     public UssdRequest() {}
 
     public Integer getRequestId() { return requestId; }
@@ -34,4 +40,10 @@ public class UssdRequest {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
+    @JsonIgnore public String getChannel() { return channel; }
+    @JsonIgnore public void setChannel(String channel) { this.channel = channel; }
+    @JsonIgnore public String getCellId() { return cellId; }
+    @JsonIgnore public void setCellId(String cellId) { this.cellId = cellId; }
+    @JsonIgnore public String getImsi() { return imsi; }
+    @JsonIgnore public void setImsi(String imsi) { this.imsi = imsi; }
 }

@@ -6,6 +6,7 @@ import com.example.productcatalogue.model.Category;
 import com.example.productcatalogue.model.Product;
 import com.example.productcatalogue.repository.CategoryRepository;
 import com.example.productcatalogue.repository.ProductRepository;
+import org.springframework.data.core.TypedPropertyPath;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class ProductService {
     }
 
     public List<Product> getAll() {
-        return productRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
+        return productRepo.findAll(Sort.by(TypedPropertyPath.path(Product::getName)).ascending());
     }
 
     public Product getById(Long id) {

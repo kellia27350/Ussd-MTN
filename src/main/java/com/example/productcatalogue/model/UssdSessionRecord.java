@@ -36,6 +36,14 @@ public class UssdSessionRecord {
     private LocalDateTime lastActivityAt;
     private String endReason;
 
+    private String serviceCode;
+    @Column(length = 20)
+    private String channel;
+    private String cellId;
+    private String imsi;
+    private Long lastProductId;
+    private String lastProductName;
+
     public UssdSessionRecord() {}
 
     public Long getId() { return id; }
@@ -60,6 +68,18 @@ public class UssdSessionRecord {
     public void setCurrentPage(Integer currentPage) { this.currentPage = currentPage; }
     public LocalDateTime getLastActivityAt() { return lastActivityAt; }
     public void setLastActivityAt(LocalDateTime lastActivityAt) { this.lastActivityAt = lastActivityAt; }
+    public String getServiceCode() { return serviceCode; }
+    public void setServiceCode(String v) { this.serviceCode = v; }
+    public String getChannel() { return channel; }
+    public void setChannel(String v) { this.channel = v; }
+    public String getCellId() { return cellId; }
+    public void setCellId(String v) { this.cellId = v; }
+    public String getImsi() { return imsi; }
+    public void setImsi(String v) { this.imsi = v; }
+    public Long getLastProductId() { return lastProductId; }
+    public void setLastProductId(Long v) { this.lastProductId = v; }
+    public String getLastProductName() { return lastProductName; }
+    public void setLastProductName(String v) { this.lastProductName = v; }
     public String getEndReason() { return endReason; }
     public void setEndReason(String endReason) { this.endReason = endReason; }
 }

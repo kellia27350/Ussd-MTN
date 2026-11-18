@@ -1,6 +1,6 @@
 package com.example.productcatalogue.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.productcatalogue.config.AppProperties;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -68,8 +68,8 @@ public class UssdSessionStore {
     private final Duration ttl;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
-    public UssdSessionStore(@Value("${app.ussd.session-ttl-seconds:180}") long ttlSeconds) {
-        this.ttl = Duration.ofSeconds(ttlSeconds);
+    public UssdSessionStore(AppProperties appProperties) {
+        this.ttl = Duration.ofSeconds(appProperties.ussd().sessionTtlSeconds());
     }
 
     public Duration getTtl() { return ttl; }

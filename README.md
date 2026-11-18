@@ -4,7 +4,7 @@ A Spring Boot REST API for managing a product catalogue (airtime, data, voice, S
 
 ## Tech Stack
 - Java 17+
-- Spring Boot 3.5
+- Spring Boot 4.1
 - PostgreSQL 18
 - Maven
 
@@ -128,3 +128,23 @@ Import `product-catalogue-ussd.postman_collection.json` into Postman — all req
 1. `POST /ussd` with `requestId: 1` → get `sessionId` + see main menu
 2. `POST /ussd` with `requestId: 0` + `sessionId` + `text: "0"` → My Deal products
 3. `POST /ussd` with `requestId: 0` + `sessionId` + `text: "1"` → product detail
+
+---
+
+## What gets recorded in the database (USSD)
+
+Tables are created automatically by Hibernate (`ddl-auto=update`); new columns are added as nullable, so existing data is kept.
+
+| Table | One row per | Contains |
+|-------|-------------|----------|
+| `ussd_dial_logs` | every request received (OK or FAILED) | phone, session, input, response, error, **channel** (`API` / `MTN_XML`), **cellId**, **imsi** |
+| `ussd_sessions` | session | phone, language, status, level, category, start/end/last activity, end reason, **serviceCode, channel, cellId, imsi, lastProductId, lastProductName** |
+| `ussd_session_steps` | every screen in a session | input, level, response shown |
+| `ussd_product_selections` (**new**) | product the caller opened/viewed | session, phone, `GROUP_OPENED` / `DETAIL_VIEWED`, product + category snapshot (name, price, validity), language, time |
+
+### Read it back
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/ussd/selections?phoneNumber=` | Products callers viewed (optionally for one number) |
+| `GET /api/ussd/sessions/{sessionId}/selections` | Products viewed in one session |
+| `GET /api/ussd/selections/popular` | Most-viewed products |

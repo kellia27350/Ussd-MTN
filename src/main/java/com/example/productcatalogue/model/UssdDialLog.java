@@ -25,6 +25,11 @@ public class UssdDialLog {
     private Integer requestId;
     private String sessionId;
 
+    @Column(length = 20)
+    private String channel;
+    private String cellId;
+    private String imsi;
+
     @Column(length = 500)
     private String inputText;
 
@@ -51,6 +56,12 @@ public class UssdDialLog {
     public void setRequestId(Integer v) { this.requestId = v; }
     public String getSessionId() { return sessionId; }
     public void setSessionId(String v) { this.sessionId = v; }
+    public String getChannel() { return channel; }
+    public void setChannel(String v) { this.channel = v; }
+    public String getCellId() { return cellId; }
+    public void setCellId(String v) { this.cellId = v; }
+    public String getImsi() { return imsi; }
+    public void setImsi(String v) { this.imsi = v; }
     public String getInputText() { return inputText; }
     public void setInputText(String v) { this.inputText = v; }
     public String getOutcome() { return outcome; }

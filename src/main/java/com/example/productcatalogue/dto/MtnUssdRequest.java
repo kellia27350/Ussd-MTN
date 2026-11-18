@@ -1,11 +1,11 @@
 package com.example.productcatalogue.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JacksonXmlRootElement(localName = "request")
+@JsonRootName("request")
 public class MtnUssdRequest {
 
     @JacksonXmlProperty(localName = "msisdn")
@@ -36,6 +36,9 @@ public class MtnUssdRequest {
         req.setSessionId(sessionid != null && !sessionid.isBlank() ? sessionid.trim() : null);
         req.setRequestId(newRequest != null ? newRequest : 1);
         req.setServiceCode("*140#");
+        req.setChannel("MTN_XML");
+        req.setCellId(cellId != null && !cellId.isBlank() ? cellId.trim() : null);
+        req.setImsi(imsi != null && !imsi.isBlank() ? imsi.trim() : null);
         return req;
     }
 

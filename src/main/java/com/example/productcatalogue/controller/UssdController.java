@@ -13,15 +13,17 @@ import com.example.productcatalogue.model.UssdDialLog;
 import com.example.productcatalogue.service.UssdAuditService;
 import com.example.productcatalogue.service.UssdProgressStore;
 import com.example.productcatalogue.service.UssdSessionStore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 import com.example.productcatalogue.model.Language;
 import com.example.productcatalogue.util.UssdMessages;
 import com.example.productcatalogue.model.UssdSessionRecord;
 import com.example.productcatalogue.model.UssdSessionStep;
 import com.example.productcatalogue.repository.UssdSessionRecordRepository;
+import com.example.productcatalogue.model.UssdProductSelection;
+import com.example.productcatalogue.service.UssdSelectionService;
 import com.example.productcatalogue.repository.UssdSessionStepRepository;
 import java.time.LocalDateTime;
 import jakarta.validation.Valid;
@@ -29,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +41,7 @@ import java.util.Comparator;
 
 
 @RestController
+@RequestMapping("/ussd")
 public class UssdController {
 
     private static final int FIRST_PAGE_SIZE = 6;
@@ -86,6 +90,7 @@ public class UssdController {
     private final UssdSessionRecordRepository sessionRecordRepository;
     private final UssdSessionStepRepository sessionStepRepository;
     private final UssdAuditService auditService;
+    private final UssdSelectionService selectionService;
 
     public UssdController(CategoryRepository categoryRepository,
                           ProductRepository productRepository,
@@ -94,7 +99,8 @@ public class UssdController {
                           ObjectMapper objectMapper,
                           UssdSessionRecordRepository sessionRecordRepository,
                           UssdSessionStepRepository sessionStepRepository,
-                          UssdAuditService auditService) {
+                          UssdAuditService auditService,
+                          UssdSelectionService selectionService) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.sessionStore = sessionStore;
@@ -103,16 +109,17 @@ public class UssdController {
         this.sessionRecordRepository = sessionRecordRepository;
         this.sessionStepRepository = sessionStepRepository;
         this.auditService = auditService;
+        this.selectionService = selectionService;
     }
 
-    @PostMapping(value = "/ussd",
+    @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<UssdResponse> handleUssdJsonOrXml(@Valid @RequestBody UssdRequest request) {
         return processUssd(request);
     }
 
-    @PostMapping(value = "/ussd",
+    @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> handleUssdPlainText(@Valid @RequestBody UssdRequest request) {
@@ -125,19 +132,19 @@ public class UssdController {
                 .body(message);
     }
 
-    @PostMapping(value = "/ussd",
+    @PostMapping(
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<UssdResponse> handleUssdForm(@Valid @ModelAttribute UssdRequest request) {
         return processUssd(request);
     }
 
-    @PostMapping(value = "/ussd/mtn",
+    @PostMapping(value = "/mtn",
             consumes = MediaType.APPLICATION_XML_VALUE,
             produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<MtnUssdResponse> handleMtnUssd(@RequestBody String rawXml) {
         try {
-            XmlMapper xmlMapper = new XmlMapper();
+            XmlMapper xmlMapper = XmlMapper.builder().build();
             MtnUssdRequest mtnRequest = xmlMapper.readValue(rawXml, MtnUssdRequest.class);
 
             org.slf4j.LoggerFactory.getLogger(UssdController.class)
@@ -173,7 +180,7 @@ public class UssdController {
         }
     }
 
-    @PostMapping(value = "/ussd",
+    @PostMapping(
             consumes = MediaType.TEXT_PLAIN_VALUE,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<UssdResponse> handleUssdPlainTextBody(@RequestBody String body) {
@@ -187,20 +194,20 @@ public class UssdController {
                 throw new IllegalArgumentException("requestId must be 0 or 1.");
             }
             return processUssd(request);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new IllegalArgumentException(
                     "Invalid JSON body. Use commas between fields, not semicolons, and set Content-Type to application/json.",
                     ex);
         }
     }
 
-    private UssdRequest parseUssdRequest(String body) throws JsonProcessingException {
+    private UssdRequest parseUssdRequest(String body) throws JacksonException {
         JsonNode payload = objectMapper.readTree(body);
         if (payload == null || payload.isNull()) {
             throw new IllegalArgumentException("USSD request body cannot be empty.");
         }
-        if (payload.isTextual()) {
-            payload = objectMapper.readTree(payload.asText());
+        if (payload.isString()) {
+            payload = objectMapper.readTree(payload.stringValue());
         }
         if (payload == null || !payload.isObject()) {
             throw new IllegalArgumentException("USSD request must be a JSON object.");
@@ -663,6 +670,8 @@ public class UssdController {
         if (parentId == null) {
             List<Product> items = productRepository.findByParentIdOrderByIdAsc(selected.getId());
             if (!items.isEmpty()) {
+                selectionService.record(sessionId, session.getPhoneNumber(),
+                        langName(session), selected, UssdProductSelection.TYPE_GROUP_OPENED);
                 session.setParentProductId(selected.getId());
                 session.setProductPage(0);
                 sessionStore.put(sessionId, session);
@@ -670,9 +679,15 @@ public class UssdController {
             }
         }
 
+        selectionService.record(sessionId, session.getPhoneNumber(),
+                langName(session), selected, UssdProductSelection.TYPE_DETAIL_VIEWED);
         session.setEndReason("COMPLETED");
         sessionStore.remove(sessionId);
         return formatProductDetail(selected, session.getLanguage());
+    }
+
+    private String langName(UssdSessionStore.Session session) {
+        return session.getLanguage() != null ? session.getLanguage().name() : DEFAULT_LANGUAGE.name();
     }
 
     private String buildCategoryPage(List<Category> categories, int page, Language language) {

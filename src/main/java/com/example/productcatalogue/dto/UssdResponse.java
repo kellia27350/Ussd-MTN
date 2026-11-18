@@ -1,8 +1,8 @@
 package com.example.productcatalogue.dto;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JacksonXmlRootElement(localName = "ussdResponse")
+@JsonRootName("ussdResponse")
 public class UssdResponse {
 
     private String sessionId;

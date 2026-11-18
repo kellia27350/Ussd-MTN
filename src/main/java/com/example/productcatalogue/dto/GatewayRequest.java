@@ -1,10 +1,10 @@
 package com.example.productcatalogue.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-@JacksonXmlRootElement(localName = "request")
+@JsonRootName("request")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GatewayRequest {
     public String msisdn;

@@ -4,32 +4,30 @@ import com.example.productcatalogue.model.Category;
 import com.example.productcatalogue.model.Product;
 import com.example.productcatalogue.repository.CategoryRepository;
 import com.example.productcatalogue.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
 
     private final CategoryRepository categoryRepo;
     private final ProductRepository productRepo;
+    private final AppProperties appProperties;
 
-    @Value("${app.seed.enabled:false}")
-    private boolean seedEnabled;
-
-    public DataSeeder(CategoryRepository categoryRepo, ProductRepository productRepo) {
+    public DataSeeder(CategoryRepository categoryRepo, ProductRepository productRepo,
+                      AppProperties appProperties) {
         this.categoryRepo = categoryRepo;
         this.productRepo = productRepo;
+        this.appProperties = appProperties;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
-        if (!seedEnabled) return;
+        if (!appProperties.seed().enabled()) return;
         if (categoryRepo.count() > 0) {
             restoreIrekureCategories();
             return;

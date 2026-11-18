@@ -1,9 +1,9 @@
 package com.example.productcatalogue.dto;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-@JacksonXmlRootElement(localName = "response")
+@JsonRootName("response")
 public class GatewayResponse {
     public String msisdn;
     public String sessionid;
